@@ -34,7 +34,26 @@ func (s *Service) Create(ctx context.Context, title string) (Page, error) {
 	return page, nil
 }
 
+func (s *Service) Get(ctx context.Context, id ID) (Page, error) {
+	return s.repo.Get(ctx, id)
+}
+
 func (s *Service) List(ctx context.Context) ([]Page, error) {
 	return s.repo.List(ctx)
 }
 
+func (s *Service) UpdateTitle(ctx context.Context, id ID, newTitle string) (Page, error) {
+	page, err := s.repo.Get(ctx, id)
+	if err != nil {
+		return Page{}, err
+	}
+	err = page.Rename(newTitle, s.clock.Now())
+	if err != nil {
+		return Page{}, err
+	}
+	return s.repo.Update(ctx, page)
+}
+
+func (s *Service) Delete(ctx context.Context, id ID) error {
+	return s.repo.Delete(ctx, id)
+}
